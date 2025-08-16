@@ -1,42 +1,52 @@
--- Configuração do Plugin 'nvim-treesitter'
--- Este plugin fornece um parser de sintaxe incremental para o Neovim, melhorando o realce de sintaxe,
--- indentação e navegação de código de forma mais precisa e eficiente.
-
-return {
-  -- Configuração do Plugin 'nvim-treesitter'
-  -- Este plugin fornece um parser de sintaxe incremental para o Neovim, melhorando o realce de sintaxe,
-  -- indentação e navegação de código de forma mais precisa e eficiente.
-  {
-    "nvim-treesitter/nvim-treesitter",
-    -- Comando de build para atualizar os parsers do Treesitter.
-    build = ":TSUpdate",
+return { -- add more treesitter parsers
+{
+    "nvim-treesitter/nvim-treesitter-context",
+    lazy = true,
     config = function()
-      require("nvim-treesitter.configs").setup({
-        -- Lista de parsers de linguagem a serem instalados.
-        ensure_installed = {
-          "lua", "vim", "vimdoc", -- Linguagens base do Neovim.
-          "javascript", "typescript", "html", "css", "go", -- Linguagens web e Go.
-          "prisma", -- Suporte para arquivos Prisma.
-          -- Adicione outras linguagens aqui conforme necessário.
-        },
-        -- Não sincroniza a instalação dos parsers (instala em segundo plano).
-        sync_install = false,
-        -- Instala automaticamente parsers para linguagens não encontradas.
-        auto_install = true,
-        -- Configurações de realce de sintaxe.
-        highlight = {
-          enable = true, -- Habilita o realce de sintaxe do Treesitter.
-          -- Outras opções como 'disable', 'additional_vim_regex_highlighting' podem ser configuradas aqui.
-        },
-        -- Outras configurações como indentação, textobjects, etc., podem ser adicionadas aqui.
-      })
-    end,
-  }, -- Comma to separate from the next plugin
+        require("treesitter-context").setup({
+            enable = true, -- Enable this plugin (Can be enabled/disabled later via commands)
+            max_lines = 1, -- How many lines the window should span. Values <= 0 mean no limit.
+            min_window_height = 0, -- Minimum editor window height to enable context. Values <= 0 mean no limit.
+            line_numbers = true,
+            multiline_threshold = 20, -- Maximum number of lines to show for a single context
+            trim_scope = "outer", -- Which context lines to discard if `max_lines` is exceeded. Choices: 'inner', 'outer'
+            mode = "cursor", -- Line used to calculate context. Choices: 'cursor', 'topline'
+            -- Separator between context and content. Should be a single character string, like '-'.
+            -- When separator is set, the context will only show up when there are at least 2 lines above cursorline.
+            separator = nil,
+            zindex = 20, -- The Z-index of the context window
+            on_attach = nil -- (fun(buf: integer): boolean) return false to disable attaching
+        })
+    end
+}, {
+    "nvim-ts-autotag",
+    config = function()
+        require("nvim-ts-autotag").setup({})
+    end
+}, {
+    "nvim-treesitter/nvim-treesitter",
+    dependencies = {"JoosepAlviste/nvim-ts-context-commentstring", "nvim-treesitter/nvim-treesitter-textobjects",
+                    "nvim-treesitter/nvim-treesitter-context", "windwp/nvim-ts-autotag"},
+    opts = function(_, opts)
+        -- Ensure ensure_installed is a table
+        opts.ensure_installed = opts.ensure_installed or {}
+        -- add tsx and treesitter
+        vim.list_extend(opts.ensure_installed,
+            {"bash", "html", "css", "javascript", "json", "lua", "markdown", "markdown_inline", "python", "query",
+             "graphql", "prisma", "regex", "tsx", "typescript", "vim", "yaml"})
+        vim.treesitter.language.register("markdown", "mdx")
 
-  -- Plugin oficial do Prisma
-  -- Fornece suporte específico para arquivos Prisma, incluindo detecção de tipo de arquivo, indentação e realce.
-  {
-    "prisma/vim-prisma",
-    -- Não requer configuração específica, apenas a presença do plugin.
-  },
-}
+        -- vim.list_extend(opts.autotag, {
+        --   enable = true,
+        -- })
+    end
+}, {
+    "norcalli/nvim-colorizer.lua",
+    config = function()
+        require("colorizer").setup()
+    end
+}, {
+    "fladson/vim-kitty",
+    ft = "kitty.conf",
+    event = "VeryLazy"
+}}
