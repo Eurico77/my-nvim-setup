@@ -9,6 +9,7 @@ return {
         require("neo-tree").setup({
             close_if_last_window = true,
             filesystem = {
+                hijack_netrw_behavior = "open_current",
                 filtered_items = {
                     hide_dotfiles = false,
                     hide_hidden = false,
@@ -17,12 +18,12 @@ return {
                 }
             },
             window = {
-                width = 40,
-                position = "left"
-                -- win_options = {
-                --     winfixwidth = true,
-                --     winfixheight = true
-                -- }
+                width = 32,
+                position = "left",
+                win_options = {
+                    winfixwidth = true,
+                    winfixheight = true
+                }
             },
             default_component_configs = {
                 icon = {
@@ -50,6 +51,25 @@ return {
                 ["<CR>"] = "open",
                 ["<Tab>"] = "open"
             }
+        })
+
+        vim.keymap.set("n", "<C-n>", function()
+            local neo_tree_open = false
+            for _, winid in ipairs(vim.api.nvim_list_wins()) do
+                local bufnr = vim.api.nvim_win_get_buf(winid)
+                if vim.api.nvim_buf_get_option(bufnr, "filetype") == "neo-tree" then
+                    neo_tree_open = true
+                    break
+                end
+            end
+
+            if neo_tree_open then
+                vim.cmd("Neotree close")
+            else
+                vim.cmd("Neotree show")
+            end
+        end, {
+            desc = "Alternar Neo-tree"
         })
 
         local devicons = require("nvim-web-devicons")

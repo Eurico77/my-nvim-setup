@@ -1,44 +1,40 @@
-return { -- add more treesitter parsers
-{
+return {{
     "nvim-treesitter/nvim-treesitter-context",
     lazy = true,
     config = function()
         require("treesitter-context").setup({
-            enable = true, -- Enable this plugin (Can be enabled/disabled later via commands)
-            max_lines = 1, -- How many lines the window should span. Values <= 0 mean no limit.
-            min_window_height = 0, -- Minimum editor window height to enable context. Values <= 0 mean no limit.
+            enable = true,
+            max_lines = 1,
+            min_window_height = 0,
             line_numbers = true,
-            multiline_threshold = 20, -- Maximum number of lines to show for a single context
-            trim_scope = "outer", -- Which context lines to discard if `max_lines` is exceeded. Choices: 'inner', 'outer'
-            mode = "cursor", -- Line used to calculate context. Choices: 'cursor', 'topline'
-            -- Separator between context and content. Should be a single character string, like '-'.
-            -- When separator is set, the context will only show up when there are at least 2 lines above cursorline.
+            multiline_threshold = 20,
+            trim_scope = "outer",
+            mode = "cursor",
             separator = nil,
-            zindex = 20, -- The Z-index of the context window
-            on_attach = nil -- (fun(buf: integer): boolean) return false to disable attaching
+            zindex = 20,
+            on_attach = nil
         })
     end
 }, {
-    "nvim-ts-autotag",
-    config = function()
-        require("nvim-ts-autotag").setup({})
-    end
-}, {
     "nvim-treesitter/nvim-treesitter",
-    dependencies = {"JoosepAlviste/nvim-ts-context-commentstring", "nvim-treesitter/nvim-treesitter-textobjects",
-                    "nvim-treesitter/nvim-treesitter-context", "windwp/nvim-ts-autotag"},
-    opts = function(_, opts)
-        -- Ensure ensure_installed is a table
-        opts.ensure_installed = opts.ensure_installed or {}
-        -- add tsx and treesitter
-        vim.list_extend(opts.ensure_installed,
-            {"bash", "html", "css", "javascript", "json", "lua", "markdown", "markdown_inline", "python", "query",
-             "graphql", "prisma", "regex", "tsx", "typescript", "vim", "yaml"})
-        vim.treesitter.language.register("markdown", "mdx")
-
-        -- vim.list_extend(opts.autotag, {
-        --   enable = true,
-        -- })
+    build = ":TSUpdate",
+    dependencies = {"windwp/nvim-ts-autotag", "nvim-treesitter/nvim-treesitter-context"},
+    config = function()
+        require("nvim-treesitter.configs").setup({
+            ensure_installed = {"typescript", "javascript", "html", "css", "lua", "tsx", "jsx", "json", "markdown"},
+            highlight = {
+                enable = true,
+                additional_vim_regex_highlighting = false
+            },
+            indent = {
+                enable = true
+            },
+            autotag = {
+                enable = true,
+                filetypes = {"html", "javascript", "typescript", "javascriptreact", "typescriptreact", "tsx", "jsx",
+                             "svelte", "vue"}
+            }
+        })
     end
 }, {
     "norcalli/nvim-colorizer.lua",

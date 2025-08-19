@@ -4,7 +4,7 @@ return {
     config = function()
         require("lualine").setup({
             options = {
-                theme = "tokyonight",
+                theme = "catppuccin",
                 component_separators = {
                     left = "",
                     right = ""
@@ -19,8 +19,7 @@ return {
             sections = {
                 lualine_a = {"mode"},
                 lualine_b = {"branch"},
-                lualine_c = {
-                {
+                lualine_c = {{
                     'filename',
                     path = 1,
                     shorting_rule = 'truncate_from_right'
@@ -32,9 +31,7 @@ return {
                         removed = " "
                     }
                 }},
-                lualine_x = {
-                'lsp_client',
-                {
+                lualine_x = {'lsp_client', {
                     "diagnostics",
                     sources = {"nvim_diagnostic"},
                     symbols = {
